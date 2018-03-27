@@ -1,7 +1,7 @@
 #' Helper function for adding an image
-#' @description Add an image inside the
-#' body of the email with this helper
-#' function.
+#'
+#' Add a local image inside the body of the
+#' email with this helper function.
 #' @param file a path to an image file.
 #' @return a character object with an HTML
 #' fragment that can be placed inside the
@@ -12,8 +12,8 @@
 #' # contains an image
 #' img_file_path <-
 #'   system.file(
-#'     "graphics",
-#'     "melon_cat.png",
+#'     "img",
+#'     "test_image.png",
 #'     package = "blastula")
 #'
 #' img_file_html <-
@@ -28,19 +28,18 @@
 #'     body = "
 #'     Hello!
 #'
-#'     Take a look at this image:
+#'     Have a look at this image:
 #'
 #'     {img_file_html}
 #'
-#'     Funny, right?
+#'     Useful, right?
 #'     ")
 #' @importFrom glue glue
 #' @importFrom knitr image_uri
-#' @export add_image
-
+#' @export
 add_image <- function(file) {
 
   uri <- knitr::image_uri(f = file)
 
-  glue::glue("<img src=\"{uri}\" />\n")
+  glue::glue("<img src=\"{uri}\" width=\"520\"/>\n")
 }

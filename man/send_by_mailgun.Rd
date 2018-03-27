@@ -26,12 +26,11 @@ addresses.}
 \item{url}{the URL for the sending domain.}
 
 \item{api_key}{the API key registered to
-the mailgun service.}
+the Mailgun service.}
 }
 \description{
-Send an email message via
-the Mailgun API. This requires an account
-with Mailgun.
+Send an email message via the Mailgun API.
+This requires an account with Mailgun.
 }
 \examples{
 \dontrun{

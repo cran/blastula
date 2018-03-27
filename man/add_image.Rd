@@ -16,17 +16,16 @@ message body wherever the image should
 appear.
 }
 \description{
-Add an image inside the
-body of the email with this helper
-function.
+Add a local image inside the body of the
+email with this helper function.
 }
 \examples{
 # Create an HTML fragment that
 # contains an image
 img_file_path <-
   system.file(
-    "graphics",
-    "melon_cat.png",
+    "img",
+    "test_image.png",
     package = "blastula")
 
 img_file_html <-
@@ -41,10 +40,10 @@ email <-
     body = "
     Hello!
 
-    Take a look at this image:
+    Have a look at this image:
 
     {img_file_html}
 
-    Funny, right?
+    Useful, right?
     ")
 }

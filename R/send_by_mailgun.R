@@ -1,7 +1,7 @@
 #' Send an email message through the Mailgun API
-#' @description Send an email message via
-#' the Mailgun API. This requires an account
-#' with Mailgun.
+#'
+#' Send an email message via the Mailgun API.
+#' This requires an account with Mailgun.
 #' @param message the email message object,
 #' as created by the \code{compose_email()}
 #' function. The object's class is
@@ -16,7 +16,7 @@
 #' addresses.
 #' @param url the URL for the sending domain.
 #' @param api_key the API key registered to
-#' the mailgun service.
+#' the Mailgun service.
 #' @examples
 #' \dontrun{
 #' # Create a simple email message using
@@ -51,8 +51,8 @@
 #'     api = "<..mailgun_api_key..>")
 #' }
 #' @import httr
-#' @export send_by_mailgun
-
+#' @importFrom glue glue
+#' @export
 send_by_mailgun <- function(message,
                             subject = NULL,
                             from,
@@ -72,6 +72,7 @@ send_by_mailgun <- function(message,
     subject_text <- glue::glue(subject)
   }
 
+  # Collapse vector of recipients to a single string
   recipients <- paste(recipients, collapse = ", ")
 
   # Post the message to Mailgun
