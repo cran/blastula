@@ -29,6 +29,8 @@
 #' interpolation for the \code{body},
 #' \code{footer}, and \code{preheader_text}
 #' string data.
+#' @param .envir allows for setting the
+#' environment.
 #' @return an \code{email_message} object,
 #' which can be used for previewing with
 #' the \code{preview_email()} function or
@@ -80,39 +82,41 @@
 #'   thing = "report")
 #' @importFrom glue glue
 #' @importFrom commonmark markdown_html
-#' @importFrom stringr str_replace_all
+#' @importFrom stringr str_replace str_replace_all str_detect
+#' @importFrom stringr str_extract str_extract_all
 #' @importFrom htmltools HTML
 #' @export
 compose_email <- function(body = NULL,
                           footer = NULL,
                           .preheader_text = NULL,
                           .title = NULL,
+                          .envir = parent.frame(),
                           ...) {
 
   if (!is.null(.preheader_text)) {
     preheader_text <-
-      glue::glue(.preheader_text, ...)
+      glue::glue(.preheader_text, ..., .envir = .envir)
   } else {
     preheader_text <- ""
   }
 
   if (!is.null(.preheader_text)) {
     title_text <-
-      glue::glue(.title, ...)
+      glue::glue(.title, ..., .envir = .envir)
   } else {
     title_text <- ""
   }
 
   if (!is.null(body)) {
     body_text <-
-      glue::glue(body, ...)
+      glue::glue(body, ..., .envir = .envir)
   } else {
     body_text <- ""
   }
 
   if (!is.null(footer)) {
     footer_text <-
-      glue::glue(footer, ...)
+      glue::glue(footer, ..., .envir = .envir)
   } else {
     footer_text <- ""
   }
@@ -129,10 +133,10 @@ compose_email <- function(body = NULL,
     stringr::str_replace_all(
       commonmark::markdown_html(footer_text), "\n", "")
 
-# Generate the email message body
-body <-
-  glue(
-  "
+  # Generate the email message body
+  body <-
+    glue::glue(
+      "
 <!doctype html>
   <html>
   <head>
@@ -261,16 +265,67 @@ body <-
   </tr>
   </table>
   </body>
-  </html>"
-  )
+  </html>")
 
   email_message <-
     list(
       html_str = as.character(body),
       html_html = body %>% htmltools::HTML())
 
+  if (email_message$html_str %>%
+      stringr::str_detect("<img cid=.*? src=\"data:image/(png|jpeg);base64,.*?\"")) {
+
+    # Extract encoded images from body
+    extracted_images <-
+      email_message$html_str %>%
+      stringr::str_extract_all(
+        "<img cid=.*? src=\"data:image/(png|jpeg);base64,.*?\"") %>%
+      unlist()
+
+    # Obtain a vector of CIDs
+    cid_names <- c()
+    for (i in seq(extracted_images)) {
+
+      cid_name <- extracted_images[i] %>%
+        stringr::str_extract("cid=\".*?\"") %>%
+        stringr::str_replace_all("(cid=\"|\")", "")
+
+      cid_names <- c(cid_names, cid_name)
+    }
+
+    # Clean the Base64 image strings
+    for (i in seq(extracted_images)) {
+      extracted_images[i] <-
+        gsub(
+          ".{1}$", "",
+          extracted_images[i] %>%
+            stringr::str_replace(
+              "<img cid=.*? src=\"data:image/(png|jpeg);base64,", ""))
+    }
+
+    # Create a list with a base64 image per list element
+    extracted_images <- as.list(extracted_images)
+
+    # Apply `cid_names` to the `extracted_images` list
+    names(extracted_images) <- cid_names
+
+    # Add the list of extracted images to the
+    # `email_message` list object
+    email_message <-
+      c(email_message, list(images = extracted_images))
+
+    # Replace <img>...</img> tags with CID values
+    for (i in seq(extracted_images)) {
+      email_message$html_str <-
+        email_message$html_str %>%
+        stringr::str_replace(
+          pattern = "<img cid=.*? src=\"data:image/(png|jpeg);base64,.*?\"",
+          replacement = paste0("<img src=\"cid:", cid_names[i], "\""))
+    }
+  }
+
+  # Apply the `email_message` class
   attr(email_message, "class") <- "email_message"
 
   email_message
 }
-

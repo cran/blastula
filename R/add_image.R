@@ -28,18 +28,25 @@
 #'     body = "
 #'     Hello!
 #'
-#'     Have a look at this image:
+#'     Here is an image:
 #'
 #'     {img_file_html}
-#'
-#'     Useful, right?
 #'     ")
 #' @importFrom glue glue
-#' @importFrom knitr image_uri
 #' @export
 add_image <- function(file) {
 
-  uri <- knitr::image_uri(f = file)
+  # Construct a CID based on the filename
+  # with a random string prepended to it
+  cid <-
+    paste0(
+      sample(letters, 12) %>% paste(collapse = ""), "__",
+      basename(file))
 
-  glue::glue("<img src=\"{uri}\" width=\"520\"/>\n")
+  # Create the image URI
+  uri <- get_image_uri(file = file)
+
+  # Generate the Base64-encoded image and place it
+  # within <img> tags
+  glue::glue("<img cid=\"{cid}\" src=\"{uri}\" width=\"520\"/>\n")
 }
