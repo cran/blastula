@@ -7,62 +7,58 @@
 send_by_mailgun(message, subject = NULL, from, recipients, url, api_key)
 }
 \arguments{
-\item{message}{the email message object,
-as created by the \code{compose_email()}
-function. The object's class is
-\code{email_message}}
+\item{message}{The email message object, as created by the \code{compose_email()}
+function. The object's class is \code{email_message}}
 
-\item{subject}{the subject of the
-email.}
+\item{subject}{The subject of the email.}
 
-\item{from}{the email address of the
-sender. This does not have to be
-the same email that is associated with
-the account actually sending the message.}
+\item{from}{The email address of the sender. This does not have to be the
+same email that is associated with the account actually sending the
+message.}
 
-\item{recipients}{a vector of email
-addresses.}
+\item{recipients}{A vector of email addresses.}
 
-\item{url}{the URL for the sending domain.}
+\item{url}{The URL for the sending domain.}
 
-\item{api_key}{the API key registered to
-the Mailgun service.}
+\item{api_key}{The API key registered to the Mailgun service.}
 }
 \description{
-Send an email message via the Mailgun API.
-This requires an account with Mailgun.
+Send an email message via the Mailgun API. This requires an account with
+Mailgun.
 }
 \examples{
-\dontrun{
 # Create a simple email message using
 # Markdown formatting
-email <-
-  compose_email(
-  body = "
-  Hello!
 
-  ## This a section heading
-
-  We can use Markdown formatting \\\\
-  to **embolden** text or to add \\\\
-  *emphasis*. This is exciting, \\\\
-  right?
-
-  Cheers")
+# email <-
+#   compose_email(
+#   body = "
+#   Hello!
+#
+#   ## This a section heading
+#
+#   We can use Markdown formatting \\\\
+#   to **embolden** text or to add \\\\
+#   *emphasis*. This is exciting, \\\\
+#   right?
+#
+#   Cheers")
 
 # Generate a vector of recipients
-recipient_list <-
-  c("person_1@site.net",
-    "person_2@site.net")
+
+# recipient_list <-
+#   c("person_1@site.net",
+#     "person_2@site.net")
 
 # Send it to multiple people through
 # the Mailgun API
-email \%>\%
-  send_by_mailgun(
-    subject = "Sent through Mailgun",
-    from = "The Sender <sender@send.org>",
-    recipients = recipient_list,
-    url = "<..mailgun_sending_domain..>",
-    api = "<..mailgun_api_key..>")
-}
+
+# email \%>\%
+#   send_by_mailgun(
+#     subject = "Sent through Mailgun",
+#     from = "The Sender <sender@send.org>",
+#     recipients = recipient_list,
+#     url = "<..mailgun_sending_domain..>",
+#     api = "<..mailgun_api_key..>")
+
 }

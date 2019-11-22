@@ -2,46 +2,52 @@
 % Please edit documentation in R/add_image.R
 \name{add_image}
 \alias{add_image}
-\title{Helper function for adding an image}
+\title{Create an HTML fragment for an embedded image}
 \usage{
-add_image(file)
+add_image(file, alt = NULL)
 }
 \arguments{
-\item{file}{a path to an image file.}
+\item{file}{A path to an image file.}
+
+\item{alt}{Text description of image passed to the \code{alt} attribute inside of
+the image (\code{<img>}) tag for use when image loading is disabled and on
+screen readers. \code{NULL} default produces blank (\code{""}) alt text.}
 }
 \value{
-a character object with an HTML
-fragment that can be placed inside the
-message body wherever the image should
-appear.
+A character object with an HTML fragment that can be placed inside
+the message body wherever the image should appear.
 }
 \description{
-Add a local image inside the body of the
-email with this helper function.
+Add a local image inside the body of the email with this helper function.
 }
 \examples{
 # Create an HTML fragment that
 # contains an image
 img_file_path <-
   system.file(
-    "img",
+    "example_files",
     "test_image.png",
-    package = "blastula")
+    package = "blastula"
+  )
 
 img_file_html <-
-  add_image(
-    file = img_file_path)
+  add_image(file = img_file_path)
 
 # Include the image in the email
 # message body by simply referencing
 # the `img_file_html` object
 email <-
   compose_email(
-    body = "
-    Hello!
+    body = md(
+      c(
+"Hello,
 
-    Here is an image:
+Here is an image:\\n",
+img_file_html
+      )
+    )
+  )
 
-    {img_file_html}
-    ")
+if (interactive()) email
+
 }

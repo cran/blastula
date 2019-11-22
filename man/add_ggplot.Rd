@@ -2,28 +2,28 @@
 % Please edit documentation in R/add_ggplot.R
 \name{add_ggplot}
 \alias{add_ggplot}
-\title{Helper function for adding an ggplot}
+\title{Create an HTML fragment for an embedded ggplot image}
 \usage{
-add_ggplot(plot_object, width = 5, height = 5)
+add_ggplot(plot_object, width = 5, height = 5, alt = NULL)
 }
 \arguments{
-\item{plot_object}{the ggplot plot object.}
+\item{plot_object}{The \code{ggplot2} plot object.}
 
-\item{width}{the width of the output plot
-in inches.}
+\item{width}{The width of the output plot in inches.}
 
-\item{height}{the height of the output
-plot in inches.}
+\item{height}{The height of the output plot in inches.}
+
+\item{alt}{Text description of image passed to the \code{alt} attribute inside of
+the image (\code{<img>}) tag for use when image loading is disabled and on
+screen readers. Defaults to the \code{ggplot2} plot object's title, if exists.
+Override by passing a custom character string or \code{""} for no text.}
 }
 \value{
-a character object with an HTML
-fragment that can be placed inside the
-message body wherever the plot image
-should appear.
+A character object with an HTML fragment that can be placed inside
+the message body wherever the plot image should appear.
 }
 \description{
-Add an ggplot plot inside the body of the
-email with this helper function.
+Add an ggplot plot inside the body of the email with this helper function.
 }
 \examples{
 library(ggplot2)
@@ -40,25 +40,26 @@ plot <-
 # contains an the ggplot as an
 # embedded plot
 plot_html <-
-  add_ggplot(
-    plot_object = plot,
-    height = 5,
-    width = 7)
+  add_ggplot(plot_object = plot)
 
 # Include the plot in the email
 # message body by simply referencing
 # the `plot_html` object
 email <-
   compose_email(
-  body = "
-  Hello!
+    body = md(
+      c(
+"Hello!
 
-  Here is a very important plot \\\\
-  that will change the way you \\\\
-  look at cars forever.
+Here is a plot that will change
+the way you look at cars forever.\\n",
+plot_html,
+"Let me know what you think
+about it!"
+      )
+    )
+  )
 
-  {plot_html}
+if (interactive()) email
 
-  So useful, right?
-  ") \%>\% preview_email()
 }
