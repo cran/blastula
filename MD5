@@ -1,7 +1,7 @@
-d823fb5daf8adb163b0db2986e765ae7 *DESCRIPTION
+616b592c031720c195b98b32f2c6615d *DESCRIPTION
 cc93f13be78dc44a583e5256b2c7e00d *LICENSE
 d7b7f9f1fc454915753af651ffc869b1 *NAMESPACE
-d439c2293cf2a54cba68c976bb80bef3 *NEWS.md
+dd25b6d0b7683c1067d690de653d21a0 *NEWS.md
 e2940925bfec35721ae7f4d6283bd720 *R/add_attachment.R
 e454a974bc9612a8032a9145b3579b4d *R/add_cta_button.R
 119014a1ebe4bed5c86ddf72991726a8 *R/add_ggplot.R
@@ -18,7 +18,7 @@ ad1b51e6d5d04027c90b2f833fe7750a *R/blastula_email_format.R
 cce20e9ea8b71d19a05c4511616aafe3 *R/bls_template.R
 3a830d090b060712fb1807e20aa82762 *R/compose_email.R
 c11d1f94e4fa2f88c250f5ed0c5773cf *R/connect_email.R
-8f67bb6882896ac6f54b984762153352 *R/create_credentials.R
+e82500beb51d7b26566413d66bd5f04c *R/create_credentials.R
 79735a85e131d59bd11b21978a3649fa *R/creds_helpers.R
 f6c1d386244f718adeffa2fed90d8b21 *R/get_html_str.R
 4f7105a53ba901a654bfae2be7bddfce *R/mime.R
@@ -253,7 +253,7 @@ f17f61f28d2e715603f51aeeca699423 *tests/testthat/test-blocks.R
 dd39b41830b2a145a4a8214f5e01e9c5 *tests/testthat/test-mime.R
 4a7ccc3b86a586a245062b9a934659f5 *tests/testthat/test-render_blocks.R
 0e4c88e98f801ee443a41f3a5a40a515 *tests/testthat/test-string_manip.R
-1aea0c4cfd4cdcf860d03e31ce622855 *tests/testthat/test-utils.R
+d05f08be23ea7ba758379b1f038416b8 *tests/testthat/test-utils.R
 82890cd34cb1c9bfefd9364f348ed011 *tests/testthat/test-utils.Rmd
 555462c10cd8fefc441271bf3976f870 *tests/testthat/test_creds_file
 3e99ba18ccbe7a9150ead0c841fc6343 *tests/testthat/url_encoding.html
