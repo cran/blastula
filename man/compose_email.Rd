@@ -4,18 +4,36 @@
 \alias{compose_email}
 \title{Create the email message body}
 \usage{
-compose_email(body = NULL, header = NULL, footer = NULL,
-  title = NULL)
+compose_email(
+  body = NULL,
+  header = NULL,
+  footer = NULL,
+  title = NULL,
+  ...,
+  template = blastula_template
+)
 }
 \arguments{
 \item{header, body, footer}{The three layout sections for an email message
 (ordered from top to bottom). Markdown text can be supplied to each of
 these by using the \code{\link[=md]{md()}} text helper function. Alternatively, we can
-supply a set of \code{block_*()} calls enclosed within the \code{\link[=blocks]{blocks()}} function
+supply a set of \verb{block_*()} calls enclosed within the \code{\link[=blocks]{blocks()}} function
 to take advantage of precomposed HTML blocks.}
 
 \item{title}{The title of the email message. This is not the subject but the
 HTML title text which may appear in limited circumstances.}
+
+\item{...}{Additional arguments to pass to the \code{template} function. If you're
+using the default template, you can use \code{font_family} to control the base
+font, and \code{content_width} to control the width of the main content; see
+\code{\link[=blastula_template]{blastula_template()}}. By default, the \code{content_width} is set to \verb{1000px}.
+Using widths less than \verb{600px} is generally not advised but, if necessary,
+be sure to test such HTML emails with a wide range of email clients before
+sending to the intended recipients. The Outlook mail client (Windows,
+Desktop) does not respect \code{content_width}.}
+
+\item{template}{An email template function to use. The default is
+\code{\link[=blastula_template]{blastula_template()}}.}
 }
 \value{
 An \code{email_message} object.

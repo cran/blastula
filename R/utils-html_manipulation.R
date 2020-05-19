@@ -22,9 +22,10 @@
 #
 find_all <- function(string,
                      pattern,
-                     ignore_case = FALSE) {
+                     ignore_case = FALSE,
+                     perl = TRUE) {
 
-  match <- gregexpr(pattern, string, perl = TRUE, ignore.case = ignore_case)[[1]]
+  match <- gregexpr(pattern, string, perl = perl, ignore.case = ignore_case)[[1]]
   match_start <- as.integer(match)
   match_start <- ifelse(match_start <= 0, NA, match_start)
 
@@ -63,9 +64,10 @@ find_all <- function(string,
 gfsub <- function(string,
                   pattern,
                   func,
-                  ignore_case = FALSE) {
+                  ignore_case = FALSE,
+                  perl = TRUE) {
 
-  matches <- find_all(string, pattern, ignore_case = ignore_case)
+  matches <- find_all(string, pattern, ignore_case = ignore_case, perl = perl)
 
   f <- file(open = "w+b", encoding = "UTF-8")
   on.exit(close(f), add = TRUE)
@@ -89,7 +91,10 @@ gfsub <- function(string,
   }
 
   out(substr2(string, pos, nchar(string) + 1L))
-  paste(collapse = "\n", readLines(f, warn = FALSE, encoding = "UTF-8"))
+
+  str <- readChar(f, seek(f), useBytes = TRUE)
+  Encoding(str) <- "UTF-8"
+  str
 }
 
 # Like substr, but the end position is exclusive (i.e. it points
@@ -147,7 +152,9 @@ parse_attr <- function(attr = "src='data'  alt    =  \"whatever\"  id = foo") {
 #' @noRd
 parse_tag <- function(tag) {
 
-  match <- find_all(tag, "^<(?>(\\w+))([^>]*?)(/?)>$")
+  # It's very important that this pattern not perform backtracking (hence the
+  # possessive quantifiers)
+  match <- find_all(tag, "^<(\\w++)([^>]*+)>$")
   if (is.null(match)) {
     return(NULL)
   }
@@ -181,9 +188,11 @@ replace_attr <- function(html,
 
   stopifnot(grepl("^[a-zA-Z]\\w*$", tag_name))
 
-  pattern <- paste0("<", tag_name, "(?!\\w)[^>]*>")
+  pattern <- paste0("<", tag_name, "\\s[^>]*>")
 
-  gfsub(html, pattern, ignore_case = TRUE, function(tag_html) {
+  # perl needs to be FALSE to prevent stack overflow for very very large input
+  # that contains unicode characters, see new_releases_email.R.
+  gfsub(html, pattern, perl = FALSE, ignore_case = TRUE, function(tag_html) {
 
     tag <- parse_tag(tag_html)
     attr_loc <- tag$attributes[[attr_name]]
@@ -266,10 +275,14 @@ src_to_datauri <- function(src,
   }
 }
 
-inline_images <- function(html_file) {
+inline_images <- function(html_file, html = NULL) {
 
-  basedir <- dirname(html_file)
-  html <- paste(collapse = "\n", readLines(html_file, warn = FALSE))
+  if (is.null(html)) {
+    basedir <- dirname(html_file)
+    html <- paste(collapse = "\n", readLines(html_file, warn = FALSE))
+  } else {
+    basedir <- getwd()
+  }
 
   replace_attr(html, tag_name = "img", attr_name = "src", function(src) {
     src <- src_to_datauri(src, basedir)
@@ -291,17 +304,24 @@ cid_counter <- function(prefix,
 # Reads in the specified HTML file, and replaces any images found
 # (either data URI or relative file references) with cid references.
 cid_images <- function(html_file,
-                       next_cid = cid_counter("img")) {
+                       next_cid = cid_counter("img"),
+                       html = NULL) {
 
   idx <- 0L
 
   next_cid <- function(content_type) {
     idx <<- idx + 1L
+    # According to the spec there should be an @domain on this, but it makes
+    # attachment UI show up for Outlook.com (e.g. AT00001.bin)
     paste0("img", idx, ".", content_type)
   }
 
-  basedir <- dirname(html_file)
-  html <- paste(collapse = "\n", readLines(html_file, warn = FALSE))
+  if (is.null(html)) {
+    basedir <- dirname(html_file)
+    html <- paste(collapse = "\r\n", readLines(html_file, warn = FALSE, encoding = "UTF-8"))
+  } else {
+    basedir <- getwd()
+  }
 
   html_data_uri <-
     replace_attr(html, tag_name = "img", attr_name = "src", function(src) {
@@ -309,6 +329,7 @@ cid_images <- function(html_file,
     })
 
   images <- new.env(parent = emptyenv())
+  cids <- new.env(parent = emptyenv())
 
   html_cid <-
     replace_attr(html_data_uri, tag_name = "img", attr_name = "src", function(src) {
@@ -318,11 +339,16 @@ cid_images <- function(html_file,
     if (is.na(data)) {
       src
     } else {
-      cid <- next_cid(content_type = content_type)
-      images[[cid]] <- structure(
-        data,
-        "content_type" = paste0("image/", content_type)
-      )
+      cids_key <- digest::digest(src)
+      cid <- cids[[cids_key]]
+      if (is.null(cid)) {
+        cid <- next_cid(content_type = content_type)
+        images[[cid]] <- structure(
+          data,
+          "content_type" = paste0("image/", content_type)
+        )
+        cids[[cids_key]] <- cid
+      }
       paste0("cid:", cid)
     }
   })
@@ -331,24 +357,34 @@ cid_images <- function(html_file,
     class = c("blastula_message", "email_message"),
     list(
       html_str = html_cid,
-      html_html = htmltools::HTML(html_data_uri),
+      html_html = HTML(html_data_uri),
+      attachments = list(),
       images = as.list(images)
     )
   )
 }
 
 decode_hex <- function(hex) {
-
-  if (nchar(hex) %% 2 == 1) {
-    hex <- paste0("0", hex)
+  if (length(hex) != 1) {
+    stop("decode_hex requires a single element character vector")
   }
+  if (!grepl("^[0-9a-f]{1,8}$", hex, ignore.case = TRUE)) {
+    stop("Invalid character code '", hex, "'; expected between 1 and 8 hex digits")
+  }
+
+  # Leading 0's inserted as necessary, so hex value is 8 UTF-32 bytes.
+  hex <- paste(collapse = "", c(rep_len("0", 8 - nchar(hex)), hex))
+
+  # This ugly chunk of code just splits the string by groups of 2 characters,
+  # and converts each pair to a byte.
   chars <- strsplit(hex, "")[[1]]
   left <- chars[c(TRUE, FALSE)]
   right <- chars[c(FALSE, TRUE)]
-  values <- strtoi(paste0(left, right), 16)
-  str <- rawToChar(as.raw(values))
-  Encoding(str) <- "UTF-8"
-  str
+  values <- as.raw(strtoi(paste0(left, right), 16))
+
+  # iconv wants its raw input wrapped in a list :shrug:
+  iconvInput <- list(values)
+  iconv(iconvInput, from = "UTF-32BE", to = "UTF-8")
 }
 
 html_unescape <- function(html) {
@@ -408,4 +444,15 @@ process_text <- function(text) {
     paste(collapse = "\n") %>%
     htmltools::htmlEscape() %>%
     tidy_gsub("\n\n", "<br />\n")
+}
+
+# A shim for htmltools::css that returns NULL in place of "". (This won't be
+# needed after the next CRAN release of htmltools)
+css <- function(..., collapse_ = "") {
+  result <- htmltools::css(..., collapse_ = collapse_)
+  if (identical(result, "")) {
+    NULL
+  } else {
+    result
+  }
 }

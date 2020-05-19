@@ -89,3 +89,39 @@ test_that("src resolution works correctly", {
   expect_true(src_to_filepath("foo/bar", "c:\\baz") %in% c("c:/baz/foo/bar", "C:/baz/foo/bar"))
   expect_true(src_to_filepath("", "c:\\baz") %in% c("c:/baz", "C:/baz"))
 })
+
+test_that("decode_hex works correctly including for Unicode chars", {
+  expect_identical(html_unescape("&#x51;"), "Q")
+  expect_identical(html_unescape("&#81;"), "Q")
+  expect_identical(html_unescape("&#x2661;"), "\u2661")
+  expect_identical(html_unescape("&#9825;"), "\u2661")
+  expect_identical(html_unescape("&#x0010FFFF;"), "\U0010FFFF")
+  expect_identical(html_unescape("&#1114111;"), "\U0010FFFF")
+
+  # Error: Too many hex digits
+  expect_error(html_unescape("&#x0010FFFFF;"))
+  expect_error(html_unescape("&#x0010FFFFF;"))
+})
+
+test_that("gfsub doesn't butcher line endings", {
+  expect_identical(
+    gfsub("a\nb\r\nc", "[\\w]", toupper),
+    toupper("a\nb\r\nc")
+  )
+})
+
+test_that("duplicate images are not attached multiple times", {
+  img <- add_image(system.file(package = "blastula", "img/pexels-photo-267151.jpeg"))
+  email <- compose_email(body = list(img, img))
+  expect_identical(length(email$images), 1L)
+})
+
+test_that("HTML manipulation functions can handle large input", {
+  big_value <- paste(collapse = "", rep_len("x", 5e7))
+  big_html <- paste0("<img src=\"", big_value, "\"/> \u2600")
+
+  result <- replace_attr(big_html, "img", attr_name = "src", function(src) {
+    "hello \u2601"
+  })
+  expect_identical(result, "<img src=\"hello \u2601\"/> \u2600")
+})

@@ -1,18 +1,15 @@
-## ---- include = FALSE----------------------------------------------------
+## ---- include = FALSE---------------------------------------------------------
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 
-## ----library, include=FALSE----------------------------------------------
+## ----library, include=FALSE---------------------------------------------------
 library(blastula)
 library(ggplot2)
 library(glue)
 
-## ----echo = FALSE, out.width = "100%"------------------------------------
-knitr::include_graphics("html_email_model.svg", dpi = 300)
-
-## ----compose_simple, eval=FALSE------------------------------------------
+## ----compose_simple, eval=FALSE-----------------------------------------------
 #  compose_email(
 #    body =
 #  "Hello,
@@ -22,13 +19,7 @@ knitr::include_graphics("html_email_model.svg", dpi = 300)
 #  Cheers
 #  ")
 
-## ----echo = FALSE, out.width = "100%"------------------------------------
-knitr::include_graphics("compose_simple-wide.png", dpi = 300)
-
-## ----echo = FALSE, out.width = "100%"------------------------------------
-knitr::include_graphics("compose_simple-narrow.png", dpi = 300)
-
-## ----compose_simple_glue, eval=FALSE-------------------------------------
+## ----compose_simple_glue, eval=FALSE------------------------------------------
 #  what <- "thing"
 #  salutation <- "Cheers"
 #  
@@ -47,7 +38,7 @@ knitr::include_graphics("compose_simple-narrow.png", dpi = 300)
 #  
 #  compose_email(body = body_text)
 
-## ----compose_interpolation_stmt, eval=FALSE------------------------------
+## ----compose_interpolation_stmt, eval=FALSE-----------------------------------
 #  #
 #  # Prepare the text inputs
 #  #
@@ -85,15 +76,12 @@ knitr::include_graphics("compose_simple-narrow.png", dpi = 300)
 #    footer = footer_text
 #  )
 
-## ----echo = FALSE, out.width = "100%"------------------------------------
-knitr::include_graphics("compose_interpolation_stmt-wide.png", dpi = 300)
-
-## ----imgur_return_value_1, include=FALSE---------------------------------
+## ----imgur_return_value_1, include=FALSE--------------------------------------
 
 imgur_image <- 
   "<a href=\"#\"><img src=\"https://i.imgur.com/8uTB2Py.jpg\" style=\"max-width: 600px; width: 100% !important; display: block; padding: 0; border: 0 !important;\" border=\"0\"></a>"
 
-## ----compose_imgur_local_image, eval=FALSE-------------------------------
+## ----compose_imgur_local_image, eval=FALSE------------------------------------
 #  # Send your image to Imgur with a Client Key;
 #  # the result is specially-crafted <img> tag
 #  # imgur_image <-
@@ -125,15 +113,12 @@ imgur_image <-
 #  
 #  compose_email(body = body_text)
 
-## ----echo = FALSE, out.width = "100%"------------------------------------
-knitr::include_graphics("compose_imgur_local_image-wide.png", dpi = 300)
-
-## ----imgur_return_value_2, include=FALSE---------------------------------
+## ----imgur_return_value_2, include=FALSE--------------------------------------
 
 imgur_image <- 
   "<a href=\"#\"><img src=\"https://i.imgur.com/biMpEEA.png\" style=\"max-width: 600px; width:100% !important; display: block; padding: 0; border: 0 !important;\" border=\"0\"></a>"
 
-## ----compose_imgur_ggplot, eval=FALSE------------------------------------
+## ----compose_imgur_ggplot, eval=FALSE-----------------------------------------
 #  # Create the plot data
 #  variety <- rep(LETTERS[1:7], each = 40)
 #  treatment <- rep(c("high", "low"), each = 20)
@@ -175,7 +160,4 @@ imgur_image <-
 #    ) %>% md()
 #  
 #  compose_email(body = body_text)
-
-## ----echo = FALSE, out.width = "100%"------------------------------------
-knitr::include_graphics("compose_imgur_ggplot-wide.png", dpi = 300)
 

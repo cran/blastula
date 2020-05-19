@@ -41,14 +41,23 @@ generate_rfc2822 <- function(eml,
                              subject = NULL,
                              from = NULL,
                              to = NULL,
-                             cc = NULL) {
+                             cc = NULL,
+                             con = NULL,
+                             uuid_source = NULL) {
+
+  if (is.null(uuid_source)) {
+    # Do this instead of (the more obvious) `uuid_source = uuid::UUIDgenerate`
+    # in the parameter declaration, to stop R CMD check complaining that uuid
+    # isn't used
+    uuid_source <- uuid::UUIDgenerate
+  }
 
   stopifnot(inherits(eml, "blastula_message"))
 
   headers <- list(
     "MIME-Version" = "1.0",
     "Date" = format_rfc2822_date(date),
-    "Message-ID" = paste0("<", uuid::UUIDgenerate(), "@blastula.local>"),
+    "Message-ID" = paste0("<", uuid_source(), "@blastula.local>"),
     "Subject" = header_unstructured(subject, "Subject", encode_unicode = TRUE),
     "From" = format_rfc2822_addr(from, "From"),
     "To" = format_rfc2822_addr_list(to, "To"),
@@ -57,10 +66,12 @@ generate_rfc2822 <- function(eml,
 
   images <- mapply(names(eml$images), eml$images, FUN = function(filename, data) {
     mime_part(
-      mime::guess_type(filename),
+      attr(data, "content_type", exact = TRUE) %||% mime::guess_type(filename),
       headers = list(
         # TODO: escape
-        "Content-ID" = paste0("<", filename, ">")
+        "Content-Disposition" = "inline",
+        "Content-ID" = paste0("<", filename, ">"),
+        "X-Attachment-Id" = filename
       ),
       content = base64enc::base64decode(data)
     )
@@ -71,6 +82,7 @@ generate_rfc2822 <- function(eml,
     raw_bytes <- readBin(attachment$file_path, "raw", n = file.info(attachment$file_path)$size)
 
     quoted_filename <- header_quoted(attachment$filename, "Filename", encode_unicode = TRUE)
+    content_id <- tidy_gsub(uuid_source(), "-", "")
 
     mime_part(
       sprintf("%s; name=%s", attachment$content_type, quoted_filename),
@@ -80,7 +92,8 @@ generate_rfc2822 <- function(eml,
           attachment$disposition,
           quoted_filename
         ),
-        "Content-ID" = paste0("<", tidy_gsub(uuid::UUIDgenerate(), "-", ""), ">")
+        "Content-ID" = paste0("<", content_id, ">"),
+        "X-Attachment-Id" = content_id
       ),
       content = raw_bytes
     )
@@ -95,7 +108,8 @@ generate_rfc2822 <- function(eml,
         content = eml$html_str
       ),
       !!!images
-    )
+    ),
+    boundary = uuid_source()
   )
 
   # This is necessary for attachments to display correctly on
@@ -108,14 +122,26 @@ generate_rfc2822 <- function(eml,
       body_parts = rlang::list2(
         msg,
         !!!attachments
-      )
+      ),
+      boundary = uuid_source()
     )
   }
 
-  f <- file(open = "w+b")
-  on.exit(close(f), add = TRUE)
-  write_mime(create_output_sink(f), msg)
-  readChar(f, seek(f), useBytes = TRUE)
+  if (is.null(con)) {
+    f <- file(open = "w+b")
+    on.exit(close(f), add = TRUE)
+    write_mime(create_output_sink(f), msg)
+    str <- readChar(f, seek(f), useBytes = TRUE)
+    Encoding(str) <- "UTF-8"
+    str
+  } else {
+    if (is.character(con)) {
+      con <- file(con, open = "w+b")
+      on.exit(close(con), add = TRUE)
+    }
+    write_mime(create_output_sink(con), msg)
+    invisible()
+  }
 }
 
 # Constant representing canonical CRLF
@@ -150,7 +176,7 @@ mime_part <- function(content_type, headers = list(), content) {
 mime_multipart <- function(content_type = c("multipart/alternative", "multipart/related", "multipart/mixed"),
   headers = list(),
   body_parts,
-  boundary = uuid::UUIDgenerate(), preamble = NULL, epilogue = NULL) {
+  boundary, preamble = NULL, epilogue = NULL) {
 
   structure(
     class = "mime_multipart",
@@ -211,7 +237,7 @@ write_mime.mime_part <- function(out, x) {
     "quoted-printable" = encode_qp,
     "base64" = function(x) {
       # Wrap at 76 chars
-      gsub("(.{76})", "\\1\r\n", encode_base64(x))
+      base64enc::base64encode(x, linewidth = 76, newline = "\r\n")
     }
   )
 
@@ -269,7 +295,7 @@ encode_qp <- function(str) {
   # Ensure that trailing spaces are not ignored
   out("=\r\n\r\n")
 
-  paste(collapse = "\n", readLines(f, warn = FALSE, encoding = "UTF-8"))
+  paste(collapse = "\r\n", readLines(f, warn = FALSE, encoding = "UTF-8"))
 }
 
 format_rfc2822_date <- function(date) {
@@ -358,7 +384,7 @@ header_quoted <- function(str, fieldname, encode_unicode = FALSE) {
   if (any(needs_encoding)) {
     if (encode_unicode) {
       str[needs_encoding] <- vapply(str[needs_encoding], function(x) {
-        encode_base64(charToRaw(x))
+        base64enc::base64encode(charToRaw(x), 0)
       }, character(1)) %>% sprintf("=?utf-8?B?%s?=", .)
       return(str)
     } else {
@@ -389,7 +415,7 @@ header_unstructured <- function(str, fieldname, encode_unicode = FALSE) {
 
   if (grepl("[^\x01-\x7F]", str)) {
     if (encode_unicode) {
-      str <- sprintf("=?utf-8?B?%s?=", encode_base64(charToRaw(str)))
+      str <- sprintf("=?utf-8?B?%s?=", base64enc::base64encode(charToRaw(str)), 0)
     } else {
       warning("The '", fieldname, "' field contains impermissible characters, ",
         "please use 7-bit ASCII only")

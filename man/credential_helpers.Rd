@@ -4,15 +4,23 @@
 \alias{credential_helpers}
 \alias{creds}
 \alias{creds_anonymous}
+\alias{creds_envvar}
 \alias{creds_key}
 \alias{creds_file}
 \title{Helpers for supplying SMTP credentials}
 \usage{
-creds(user = NULL, provider = NULL, host = NULL, port = NULL,
-  use_ssl = TRUE)
+creds(user = NULL, provider = NULL, host = NULL, port = NULL, use_ssl = TRUE)
 
-creds_anonymous(provider = NULL, host = NULL, port = NULL,
-  use_ssl = TRUE)
+creds_anonymous(provider = NULL, host = NULL, port = NULL, use_ssl = TRUE)
+
+creds_envvar(
+  user = NULL,
+  pass_envvar = "SMTP_PASSWORD",
+  provider = NULL,
+  host = NULL,
+  port = NULL,
+  use_ssl = TRUE
+)
 
 creds_key(id)
 
@@ -22,7 +30,7 @@ creds_file(file)
 \item{user}{The username for the email account. Typically, this is the email
 address associated with the account.}
 
-\item{provider}{An optional email provider shortname for autocompleting STMP
+\item{provider}{An optional email provider shortname for autocompleting SMTP
 configuration details (the \code{host}, \code{port}, \code{use_ssl} options). Options
 currently include \code{gmail}, \code{outlook}, and \code{office365}. If nothing is
 provided then values for \code{host}, \code{port}, and \code{use_ssl} are expected.}
@@ -31,6 +39,10 @@ provided then values for \code{host}, \code{port}, and \code{use_ssl} are expect
 and \code{port} parameters are the address and port for the SMTP server;
 \code{use_ssl} is an option as to whether to use SSL: supply a \code{TRUE} or \code{FALSE}
 value.}
+
+\item{pass_envvar}{The name of the environment variable that holds the value
+for an email account password. This is only used in the \code{\link[=creds_envvar]{creds_envvar()}}
+credential helper function.}
 
 \item{id}{When using the \code{\link[=creds_key]{creds_key()}} credential helper, the ID value of the
 key (in the system key-value store) needs to be given here. This was
@@ -69,4 +81,9 @@ using the \code{\link[=create_smtp_creds_key]{create_smtp_creds_key()}} function
 The \code{\link[=creds_file]{creds_file()}} credential helper is used to obtain credentials from a
 file stored on disk. We can create that file using the
 \code{\link[=create_smtp_creds_file]{create_smtp_creds_file()}} function.
+
+The \code{\link[=creds_envvar]{creds_envvar()}} credential helper reads the password from the
+\code{SMTP_PASSWORD} environment variable (or an environment variable name that
+you specify). If using environment variables for other parameters, call
+\code{\link[=Sys.getenv]{Sys.getenv()}} manually (e.g. \code{user = Sys.getenv("SMTP_USER")}).
 }
