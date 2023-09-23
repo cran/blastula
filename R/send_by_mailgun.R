@@ -49,12 +49,14 @@
 #' #     api = "<..mailgun_api_key..>")
 #'
 #' @export
-send_by_mailgun <- function(message,
-                            subject = NULL,
-                            from,
-                            recipients,
-                            url,
-                            api_key) {
+send_by_mailgun <- function(
+    message,
+    subject = NULL,
+    from,
+    recipients,
+    url,
+    api_key
+) {
 
   # nocov start
 
@@ -71,15 +73,19 @@ send_by_mailgun <- function(message,
   recipients <- paste(recipients, collapse = ", ")
 
   # Post the message to Mailgun
-  httr::POST(
+  httr::RETRY(
+    verb = "POST",
     url = url,
-    httr::authenticate("api", api_key),
+    config = authenticate("api", api_key),
     encode = "form",
     body = list(
       from = from,
       to = recipients,
       subject = subject,
-      html = message$html_html))
+      html = message$html_html
+    ),
+    terminate_on = c(403, 404)
+  )
 
   # nocov end
 }
