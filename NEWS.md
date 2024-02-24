@@ -1,3 +1,7 @@
+# blastula 0.3.5
+
+* Fixed Excel attachments which were broken due to faulty conversion into RFC2822. (#314)
+
 # blastula 0.3.4
 
 * Modified tests to remove specific cases that no longer work in newer versions of R. (#310)

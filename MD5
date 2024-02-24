@@ -1,7 +1,7 @@
-a7b87a963c6e8d3d1c43070bc3cac382 *DESCRIPTION
-f00595836555c1c534cc4d923557b956 *LICENSE
+3698a2dcf5f6697515f47fc456169923 *DESCRIPTION
+329cd1e3347a89675716a2798b3b9971 *LICENSE
 b8289a83fd271b65bb502b2ad5aa40d1 *NAMESPACE
-ffd5c7efee382c2f08793c53e33f37e0 *NEWS.md
+284f9157bd688fb9e35d76835290ab51 *NEWS.md
 fd2cfd16a81b14165c41d4e9998b58b9 *R/add_attachment.R
 cba4331db80cede4809cd25cc17e4017 *R/add_cta_button.R
 418672e15bdd6e547164f07dc350c783 *R/add_ggplot.R
@@ -21,7 +21,7 @@ c7d5143f9f347a5c3fa1011a5f20353e *R/connect_email.R
 d574e0b70e930446b62ef6475c3b98bf *R/create_credentials.R
 c9a4a7a51c22940539690277db6b3e92 *R/creds_helpers.R
 72caf10904f80f91ceecd2aec986fbbd *R/get_html_str.R
-6f839a6b57203412b03e953d1e3bd47d *R/mime.R
+31cf3360238545936641dea100af78d1 *R/mime.R
 cd92b45c8775af9610935bff3e3bf567 *R/panel.R
 445256180a6b546ba587b1b2122a45d8 *R/pipe.R
 193c3022ec51e773aeceedcd74ee3771 *R/prepare_rsc_example_files.R
@@ -30,7 +30,7 @@ edf495565b2fef0db1c31d168e3eca34 *R/print.R
 d74dc458a9d795ed84a473fb276aba02 *R/render_email.R
 fc65c9f328a475d5cfe84f115c373109 *R/retrieve_credentials.R
 be46a3479c04d856bc3c7669c3133ad3 *R/send_by_mailgun.R
-171f572bdfd7dfeeb92bf52184f00029 *R/smtp_send.R
+2980d751541c482c1ccaa36c0b53c014 *R/smtp_send.R
 519c7643a5a912b1f309bcd01a21ddc6 *R/sysdata.rda
 c984a9aef75ffa69345fc4f187f9b481 *R/text_helpers.R
 f62f4e84906b9bdc43d414c583b56025 *R/utils-html_manipulation.R
@@ -41,7 +41,6 @@ e487b969c793ea0a9f84be0d5fab8559 *R/zzz.R
 d9aaf02d86db4f0069dfdf960ba8f0d6 *inst/example_files/test_image.png
 5f574b95928a620f6bd63dcc47fd4e11 *inst/examples/austin_home_sales.csv
 ef3dc7c5842e9bfed2a5ec12ea2f47f9 *inst/examples/connect-example-email.Rmd
-608ad93361f4ce67ce99ef12c001d282 *inst/examples/connect-example-email.html
 7a5b6ab0b52fce0b60e82a95b0db6c9f *inst/examples/connect-example-main.Rmd
 99f6566e1be7cdff9b9a3d638c3df46d *inst/examples/connect-example-text-only.Rmd
 bfe49ae95ec785ae9ec2253257c0eb8d *inst/examples/standalone_email.Rmd
@@ -222,9 +221,6 @@ aaf4b1c27f76dfcbe367322762364688 *man/create_smtp_creds_key.Rd
 2e13d7bd6e3c8b426532f1d38cfabfa9 *man/credential_helpers.Rd
 5c8da3e097875480e8de6a3348adac21 *man/delete_all_credential_keys.Rd
 7feec87829cfa13c127773f9d5e80069 *man/delete_credential_key.Rd
-37a5e2d068685c65da6ba97ad8e112e3 *man/figures/logo.png
-7dc5f7bd5d3515bfcc25d4a1b133322b *man/figures/logo.svg
-a8ca1dba946c7ec0d21447fc23c8d882 *man/figures/rstudio_preview_email.png
 597b2b4355afaa88d1e723b753fde923 *man/get_html_str.Rd
 a59fc17f968dec657acc1abea131a9e2 *man/md.Rd
 a6a95e6c8c1c366e80414a115e2cf62a *man/pipe.Rd
@@ -233,11 +229,10 @@ c3f166380aead9227d1e07e68021725c *man/prepare_test_message.Rd
 9d5b4f5f671fd1f6cebf9dabddf93213 *man/print.blastula_message.Rd
 91a3e2bd80c77863a5b87a46773ddff2 *man/render_email.Rd
 ff2c56ac3d1188ee8f92ee36e88c41cf *man/send_by_mailgun.Rd
-58fdf985f0db24618bedcd22b7704bda *man/smtp_send.Rd
+e8103e5a60c1452b97dffef5b66a5d7d *man/smtp_send.Rd
 37503195120cba14859a4b2d19375aae *man/social_link.Rd
 6c1fc9e03d506226b1b709caed992fdc *man/suppress_scheduled_email.Rd
 edeb2ed5d6f1b1a283f61af5087b0a80 *man/view_credential_keys.Rd
-0622a97a2aaa3c342f09636052c2d7f5 *tests/spelling.R
 21dd5a2ac3abf69890293a79fc6163ae *tests/testthat.R
 132c4423666e1073cb82cd725e4b3d42 *tests/testthat/_snaps/add_cta_button.md
 9cd0e348cd6767675f1240f67905254f *tests/testthat/_snaps/blocks.md
@@ -257,7 +252,7 @@ d6de19e2d21ee0e6be49e18a571baed7 *tests/testthat/test-get_html_str.R
 fd1de7dda0f342ce783182bf5ea9bb78 *tests/testthat/test-helper_fcns.R
 0593a7c78379c8928b379ff8d68dc89c *tests/testthat/test-html_manip.R
 1535514304de55bd6366a9cde40209bf *tests/testthat/test-integration.R
-9780d24ae18695e1ce3c2ff218f2295f *tests/testthat/test-mime.R
+d457d82543cc5a3458342abb8ecd56e2 *tests/testthat/test-mime.R
 3727960f146bea2d1cef9c2ef129d672 *tests/testthat/test-render_blocks.R
 89409f44ec758bc5b286fee104a33adb *tests/testthat/test-string_manip.R
 25b5f22054827c625f40a6033f07366e *tests/testthat/test-text_helpers.R
