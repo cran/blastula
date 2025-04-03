@@ -275,6 +275,8 @@ write_mime <- function(out, x) {
   UseMethod("write_mime", x)
 }
 
+#' @noRd
+#' @export
 write_mime.mime_part <- function(out, x) {
   write_headers(out, x$headers)
 
@@ -290,6 +292,8 @@ write_mime.mime_part <- function(out, x) {
   out(crlf)
 }
 
+#' @noRd
+#' @export
 write_mime.mime_multipart <- function(out, x) {
 
   # headers, body_parts, boundary, preamble, epilogue
@@ -306,6 +310,8 @@ write_mime.mime_multipart <- function(out, x) {
   out(x$epilogue)
 }
 
+#' @noRd
+#' @export
 write_mime.default <- function(out, x) {
   stop("Not implemented for ", class(x))
 }
@@ -511,7 +517,7 @@ header_unstructured <- function(
 
     if (encode_unicode) {
       str <- enc2utf8(str)
-      str <- sprintf("=?utf-8?B?%s?=", base64enc::base64encode(charToRaw(str)), 0)
+      str <- sprintf("=?utf-8?B?%s?=", base64enc::base64encode(charToRaw(str)))
 
     } else {
 

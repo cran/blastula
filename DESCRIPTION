@@ -1,12 +1,12 @@
 Type: Package
 Package: blastula
-Version: 0.3.5
+Version: 0.3.6
 Title: Easily Send HTML Email Messages
 Description: Compose and send out responsive HTML email messages that render
     perfectly across a range of email clients and device sizes. Helper functions
     let the user insert embedded images, web link buttons, and 'ggplot2' plot
     objects into the message body. Messages can be sent through an 'SMTP'
-    server, through the 'RStudio Connect' service, or through the 'Mailgun' API
+    server, through the 'Posit Connect' service, or through the 'Mailgun' API
     service <https://www.mailgun.com/>.
 Authors@R: c(
     person("Richard", "Iannone", role = c("aut", "cre"), email = "rich@posit.co",
@@ -31,11 +31,11 @@ Suggests: covr, ggplot2, glue, testthat (>= 3.0.0), keyring, knitr,
         xml2, openxlsx, withr
 SystemRequirements: pandoc (>= 1.12.3) - http://pandoc.org
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Config/testthat/edition: 3
 Language: en-US
 NeedsCompilation: no
-Packaged: 2024-02-24 21:09:15 UTC; riannone
+Packaged: 2025-04-02 22:21:00 UTC; riannone
 Author: Richard Iannone [aut, cre] (<https://orcid.org/0000-0003-3925-190X>),
   Joe Cheng [aut],
   Jeroen Ooms [ctb] (<https://orcid.org/0000-0002-4035-0289>),
@@ -43,4 +43,4 @@ Author: Richard Iannone [aut, cre] (<https://orcid.org/0000-0003-3925-190X>),
   Posit Software, PBC [cph, fnd]
 Maintainer: Richard Iannone <rich@posit.co>
 Repository: CRAN
-Date/Publication: 2024-02-24 21:30:03 UTC
+Date/Publication: 2025-04-03 08:10:07 UTC
